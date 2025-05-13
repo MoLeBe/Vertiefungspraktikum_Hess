@@ -55,7 +55,7 @@ iron_se <-iron_fits [!(positions_all %in% pos_to_remove), ]
 pos_to_remove <- unique(norm_standard_dt[Replicon != "chromosome", end])
 positions_all <- rowRanges(std_fits)$position
 std_se <- std_fits[!(positions_all %in% pos_to_remove), ]
-´´´ 
+```
 ### 📈 Segmenting for Visualization
 At this point, the data is ready for segmentation and visualization.
 
@@ -78,7 +78,7 @@ iron_se_segmented <- iron_se %>%
   Rcpp_segment("half_life", pen = iron_pen[["hl_best_penalty"]]) %>%
   Rcpp_segment("intensity", pen = iron_pen[["int_best_penalty"]])
 
-´´´
+```
 
 ### 📊 Visualizing Segmented Data
 
@@ -87,7 +87,7 @@ Now that the data is segmented, we can visualize the results for each condition 
 ```r
 final_vis_seg(std_se_segmented, "std_se_segmentation", gff3_file_path = gff3_file_path)
 final_vis_seg(iron_se_segmented, "iron_se_segmentation", gff3_file_path = gff3_file_path)
-´´´
+```
 ### 🔍 Comparative Analysis Between Conditions
 
 If the goal is to compare the two conditions directly, we follow a different pipeline.
@@ -103,13 +103,13 @@ This comparison data is then segmented:
 comp_se <- segment_HL_Rcpp_comp(std_se, iron_se) %>%
   segment_int_Rcpp_comp(iron_se)
 
-´´´
+```
 
 And visualized using the comparison plotting function:
 
 ```r
 final_vis_seg_comp(comp_se ,iron_se ,name = "condition_comparison_segmentation", gff3_file_path = gff3_file_path)
-´´´
+```
 ### 📈 Fold Change Visualization
 
 As part of the post-processing workflow, we also generate a plot comparing segment-wise:
@@ -122,4 +122,4 @@ This is accomplished with:
 ```r
 difference_se <- get_dif_se(std_se, iron_se, gff3_file_path = gff3_file_path)
 hl_int_plot(difference_se, "half_life_intensity_FC_comparison")
-´´´
+```
