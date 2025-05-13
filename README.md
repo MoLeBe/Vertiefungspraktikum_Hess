@@ -16,7 +16,7 @@ To begin, the data must be loaded into R. This can be done in one of two ways:
 
 
 Regardless of the starting point, you should end up with **two** `SummarizedExperiment` objects—one for each condition.  
-In this example, they are named `se_norm_standard` and `se_iron_standard`, representing **standard** and **iron-depleted** conditions, respectively.
+In this example, they are named `se_norm_standard` and `se_norm_iron`, representing **standard** and **iron-depleted** conditions, respectively.
 
 ### 🧼 Preprocessing
 
@@ -25,7 +25,7 @@ These objects are then passed through a preprocessing step using the `rifi_prepr
 ```r
 # Example preprocessing (adjust 'thrsh_check' and 'bg' to your dataset)
 preprocessed_std <- rifi_preprocess_no_TI(se_norm_standard, cores = 30, thrsh_check = 850, bg = 2500)
-preprocessed_iron <- rifi_preprocess_no_TI(se_iron_standard, cores = 30, thrsh_check = 850, bg = 2500)
+preprocessed_iron <- rifi_preprocess_no_TI(se_norm_iron, cores = 30, thrsh_check = 850, bg = 2500)
 ```
 
 ### 🔬 Fitting
@@ -62,7 +62,7 @@ At this point, the data is ready for segmentation and visualization.
 Here, we segment the data to visualize intensity and half-life profiles.
 This segmentation is not intended for condition comparisons, but rather for generating interpretable visual segments.
 
-We start by determining optimal penalties for both half-life and intensity using penalty_det_wrapper(), and then apply the segmentation:
+We start by determining optimal penalties out of a user defined penalty vector for both half-life and intensity using penalty_det_wrapper(), and then apply the segmentation:
 ```r
 # Determine best segmentation penalties
 std_pen <- penalty_det_wrapper(std_se, penalty_vector = c(0.01, 0.1, 1, 2, 5, 10, 20, 30, 50))
