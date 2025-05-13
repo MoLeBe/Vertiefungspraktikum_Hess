@@ -123,4 +123,4 @@ This is accomplished with:
 difference_se <- get_dif_se(std_se, iron_se, gff3_file_path = gff3_file_path)
 hl_int_plot(difference_se, "half_life_intensity_FC_comparison")
 ```
-![Exemplary half-life intensity fold change plot](workflow_example.png)
+![Exemplary half-life intensity fold change plot](Half_life_intensity_plot.png)
