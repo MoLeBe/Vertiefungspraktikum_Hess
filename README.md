@@ -55,7 +55,7 @@ iron_se <-iron_fits [!(positions_all %in% pos_to_remove), ]
 pos_to_remove <- unique(norm_standard_dt[Replicon != "chromosome", end])
 positions_all <- rowRanges(std_fits)$position
 std_se <- std_fits[!(positions_all %in% pos_to_remove), ]
-
+´´´ 
 ### 📈 Segmenting for Visualization
 At this point, the data is ready for segmentation and visualization.
 
