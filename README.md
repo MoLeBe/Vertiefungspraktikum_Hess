@@ -14,7 +14,98 @@ To begin, the data must be loaded into R. This can be done in one of two ways:
 
    - If starting from raw data, use the prepare_replicate_data_for_fit.R pipeline to process it into the correct format.
 
+📥 Loading and Preparing the Normalized Microarray Data
 
+This section reads normalized expression data from .txt files and constructs SummarizedExperiment objects for both standard and iron-depleted conditions if necessary.
+```r
+# Load and preprocess the normalized expression data
+norm_standard_dt <- as.data.table(read_delim(
+  "~/Desktop/Vertiefungspraktikum_Code/microarray_data_raw/normalized_expression_standard.txt"
+))
+
+# Remove rows with missing positions and define genomic positions and strand
+norm_standard_dt <- norm_standard_dt %>%
+  filter(!is.na(start)) %>%
+  mutate(
+    position_1 = start,
+    position_2 = end,
+    strand = ifelse(orientation == "+", "-", "+")  # Flip strand orientation
+  )
+
+# Extract WT sample columns and create an expression matrix
+assay_data <- as.matrix(norm_standard_dt[, grep("^WT", names(norm_standard_dt)), with = FALSE])
+rownames(assay_data) <- norm_standard_dt[[1]]
+
+# Define timepoints and replicates
+time_points <- c(0, 2, 4, 8, 16, 32, 64, 0, 2, 4, 8, 16, 32, 64, 0, 8, 2, 4)
+replicates <- c(1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3)
+
+# Create column metadata
+col_data <- DataFrame(timepoint = time_points, replicate = replicates)
+colnames(assay_data) <- paste0("T", time_points, "_R", replicates)
+
+# Define row metadata (genomic ranges)
+rowRanges <- GRanges(
+  seqnames = Rle(rep("chr", nrow(norm_standard_dt))),
+  ranges = IRanges(
+    start = as.numeric(norm_standard_dt$position_1),
+    end = as.numeric(norm_standard_dt$position_2)
+  ),
+  strand = Rle(norm_standard_dt$strand),
+  position = as.integer(Rle(norm_standard_dt$position_2))
+)
+
+# Build the SummarizedExperiment object
+se_norm_standard <- SummarizedExperiment(
+  assays = list(counts = assay_data),
+  colData = col_data,
+  rowRanges = rowRanges
+)
+
+
+# Load and preprocess the iron condition data
+norm_iron_dt <- as.data.table(read_delim(
+  "~/Desktop/Vertiefungspraktikum_Code/microarray_data_raw/normalized_expression_iron.txt"
+))
+
+norm_iron_dt <- norm_iron_dt %>%
+  filter(!is.na(start)) %>%
+  mutate(
+    position_1 = start,
+    position_2 = end,
+    strand = ifelse(orientation == "+", "-", "+")
+  )
+
+# Extract DFB sample columns and create an expression matrix
+assay_data <- as.matrix(norm_iron_dt[, grep("^DFB", names(norm_iron_dt)), with = FALSE])
+rownames(assay_data) <- norm_iron_dt[[1]]
+
+# Define timepoints and replicates
+time_points <- rep(c(0, 2, 4, 8, 16, 32, 64), times = 2)
+replicates <- rep(1:2, each = 7)
+
+# Create column metadata
+col_data <- DataFrame(timepoint = time_points, replicate = replicates)
+colnames(assay_data) <- paste0("T", time_points, "_R", replicates)
+
+# Define row metadata
+rowRanges <- GRanges(
+  seqnames = Rle(rep("chr", nrow(norm_iron_dt))),
+  ranges = IRanges(
+    start = as.numeric(norm_iron_dt$position_1),
+    end = as.numeric(norm_iron_dt$position_2)
+  ),
+  strand = Rle(norm_iron_dt$strand),
+  position = as.integer(Rle(norm_iron_dt$position_2))
+)
+
+# Build the SummarizedExperiment object
+se_norm_iron <- SummarizedExperiment(
+  assays = list(counts = assay_data),
+  colData = col_data,
+  rowRanges = rowRanges
+)
+```
 Regardless of the starting point, you should end up with **two** `SummarizedExperiment` objects—one for each condition.  
 In this example, they are named `se_norm_standard` and `se_norm_iron`, representing **standard** and **iron-depleted** conditions, respectively.
 
